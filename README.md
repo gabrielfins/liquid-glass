@@ -124,3 +124,18 @@ npm run docs:build  # the docs site, built to site/
 npm run build       # the library, to dist/ (ESM and types)
 npm run check       # type-check
 ```
+
+## Release
+
+`main` only changes through a pull request from `dev`, and the `build` check has to pass first.
+
+1. In a pull request, bump the version (`npm version patch --no-git-tag-version`, or `minor` / `major`) and merge it into `main`.
+2. After the merge, tag that commit on `main` and push the tag. The tag has to match the version in `package.json`:
+
+   ```sh
+   git switch main && git pull
+   git tag -a vX.Y.Z -m "vX.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+3. The publish workflow runs the type-check and the build, then publishes to npm with provenance. A new version can take a minute or two to show up on the registry.
