@@ -55,7 +55,8 @@ button, input, select { font-family: inherit; }
   border-radius: inherit;
   backdrop-filter: var(--glass-filter);
 }
-.brand { color: var(--text); font: 600 24px/1 var(--serif); text-decoration: none; }
+.brand { display: flex; align-items: center; }
+.brand img { display: block; height: 26px; width: auto; }
 .topbar nav { display: flex; align-items: center; gap: 4px; }
 .topbar nav a {
   color: var(--text);
@@ -131,7 +132,9 @@ button, input, select { font-family: inherit; }
   background: rgba(0, 0, 0, 0.08);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
 }
-.hero-panel h1 { font-size: clamp(48px, 10vw, 84px); }
+/* The logo is the heading, so it keeps the soft shadow the text heading had. */
+.hero-panel h1 { line-height: 0; }
+.hero-panel h1 img { display: block; width: min(400px, 100%); height: auto; margin: 0 auto; filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.35)); }
 .hero-panel p { margin: 14px 0 22px; font-size: 19px; }
 
 .install {
