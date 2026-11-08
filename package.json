@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/gabrielfins/liquid-glass/issues"
   },
-  "homepage": "https://github.com/gabrielfins/liquid-glass#readme",
+  "homepage": "https://gabrielfins.github.io/liquid-glass/",
   "type": "module",
   "sideEffects": [
     "./dist/index.js"

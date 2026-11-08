@@ -1,6 +1,10 @@
 # liquid-glass
 
-A glass effect for any element, set with a data attribute: backdrop blur, a lens-like distortion at the edges that follows the element's own size and corner radius, and a soft glow just inside the rim. No dependencies, about 13 KB, and no framework.
+A glass effect for any element, set with a data attribute: backdrop blur, a lens-like distortion at the edges that follows the element's own size and corner radius, and a soft glow just inside the rim. No dependencies, about 5 KB gzipped, and no framework.
+
+[![liquid-glass: glass over a colourful background](https://gabrielfins.github.io/liquid-glass/screenshot.png)](https://gabrielfins.github.io/liquid-glass/)
+
+**[Docs and live playground](https://gabrielfins.github.io/liquid-glass/)**
 
 ## Install
 
