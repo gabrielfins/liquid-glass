@@ -121,6 +121,7 @@ A glass element runs a backdrop filter, which is among the pricier CSS effects, 
 npm install
 npm run dev         # the docs site (docs/), with the live playground
 npm run docs:build  # the docs site, built to site/
+npm run meta-image   # regenerates the share image (docs/public/meta-image.jpg)
 npm run build       # the library, to dist/ (ESM and types)
 npm run check       # type-check
 ```
