@@ -1,4 +1,4 @@
-# <img src="docs/logo.svg" alt="liquid-glass" width="350px" />
+# liquid-glass
 
 A glass effect for any element, set with a data attribute: backdrop blur, a lens-like distortion at the edges that follows the element's own size and corner radius, and a soft glow just inside the rim. No dependencies, about 5 KB gzipped, and no framework.
 
