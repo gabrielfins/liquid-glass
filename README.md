@@ -1,8 +1,8 @@
-# Liquid Glass
+# liquid-glass
 
-A glass effect for any element, set with a data attribute: backdrop blur, a lens-like distortion at the edges that follows the element's own size and corner radius, and a soft glow just inside the rim. No dependencies, about 5 KB gzipped, and no framework.
+A glass effect for any element, set with a data attribute: backdrop blur, a lens-like distortion at the edges that follows the element's own size and corner radius, and a soft glow just inside the rim. No dependencies, about 6 KB gzipped, and no framework.
 
-[![Liquid Glass: glass over a colourful background](https://gabrielfins.github.io/liquid-glass/screenshot.png)](https://gabrielfins.github.io/liquid-glass/)
+[![liquid-glass: glass over a colourful background](https://gabrielfins.github.io/liquid-glass/screenshot.png)](https://gabrielfins.github.io/liquid-glass/)
 
 **[Docs and live playground](https://gabrielfins.github.io/liquid-glass/)**
 
@@ -14,10 +14,12 @@ npm install @gabrielfins/liquid-glass
 
 ## Use
 
-Import the package once, then add the attribute to any element:
+Start it once, then add the attribute to any element:
 
 ```js
-import '@gabrielfins/liquid-glass';
+import { start } from '@gabrielfins/liquid-glass';
+
+start();
 ```
 
 ```html
@@ -26,7 +28,74 @@ import '@gabrielfins/liquid-glass';
 
 Give the element a size and a `border-radius`; the glass follows both, including while they animate. It needs something behind it to bend, so it belongs over images, gradients or text.
 
-Elements are found when they are added to the page, moved or removed, and when their attributes change, so it works with whatever produces the markup: plain HTML, a CMS, or any framework.
+Elements are found when they are added to the page, moved or removed, and when their attributes change, so it works with plain HTML, a CMS, or any framework.
+
+`start()` returns a function that stops it and clears the glass it made. Calling `start()` again while it runs does nothing and returns the same function, so it is safe in code that may run twice. On a page without a bundler, load it as a module:
+
+```html
+<script type="module">
+  import { start } from 'https://esm.sh/@gabrielfins/liquid-glass';
+
+  start();
+</script>
+```
+
+## In a framework
+
+Start it once the page is mounted, not when the module loads. `start()` edits the HTML it finds (inline styles, a glow layer, an SVG of filters), and a framework that hydrates server-rendered HTML rejects changes it did not make: React logs a hydration error, Vue removes the glow layer, and Svelte warns. Every framework has a hook that runs only in the browser, after hydration, and the function `start()` returns is the cleanup it expects.
+
+**React and Next.js**, in a client component rendered once near the root:
+
+```jsx
+'use client'; // Next.js only
+
+import { useEffect } from 'react';
+import { start } from '@gabrielfins/liquid-glass';
+
+export function LiquidGlass() {
+  useEffect(() => start(), []);
+  return null;
+}
+```
+
+**Vue and Nuxt**:
+
+```vue
+<script setup>
+import { onBeforeUnmount, onMounted } from 'vue';
+import { start } from '@gabrielfins/liquid-glass';
+
+let stop;
+onMounted(() => { stop = start(); });
+onBeforeUnmount(() => stop?.());
+</script>
+```
+
+**Svelte and SvelteKit**:
+
+```svelte
+<script>
+  import { onMount } from 'svelte';
+  import { start } from '@gabrielfins/liquid-glass';
+
+  onMount(() => start());
+</script>
+```
+
+**Angular**:
+
+```ts
+import { Component, DestroyRef, afterNextRender, inject } from '@angular/core';
+import { start } from '@gabrielfins/liquid-glass';
+
+@Component({ selector: 'app-root', template: '<router-outlet />' })
+export class App {
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => destroyRef.onDestroy(start()));
+  }
+}
+```
 
 ## Attributes
 
@@ -90,12 +159,12 @@ The glow reads the `--liquid-glass-glow-color` custom property (white by default
 .dark-section { --liquid-glass-glow-color: #8690e9; }
 ```
 
-## Without the observer
+## One element at a time
 
-`import '@gabrielfins/liquid-glass'` starts watching the page. To control it yourself, import the functions alone from `/core`, which starts nothing:
+`start()` looks for the attribute. To control a single element yourself, use `glass()`, which starts nothing else:
 
 ```js
-import { glass } from '@gabrielfins/liquid-glass/core';
+import { glass } from '@gabrielfins/liquid-glass';
 
 const card = glass(document.querySelector('.card'), { blur: 8 });
 
@@ -103,7 +172,9 @@ card.update({ blur: 12 });
 card.destroy();
 ```
 
-The options are `blur`, `enabled`, `glow` and `pseudo`, as above. `configure`, `getConfig` and `subscribe` are exported from both entries and share one set of settings.
+The options are `blur`, `enabled`, `glow` and `pseudo`, as above. `configure`, `getConfig` and `subscribe` are exported alongside them and share one set of settings.
+
+`@gabrielfins/liquid-glass/core` exports the same API. The only difference is that the main entry gives a one-time console warning on a page that has `data-liquid-glass` elements but never called `start()`, for anyone still relying on the old import-to-start behaviour (before 0.2.0, importing the package started it).
 
 ## Browser support
 

@@ -60,6 +60,9 @@ function addGlowStyles() {
     document.head.append(element);
     subscribe(update);
     styleEl = element;
+  } else if (!styleEl.isConnected) {
+    // Taken out of the page by something else, as the filters' SVG can be: put it back.
+    document.head.append(styleEl);
   }
 }
 

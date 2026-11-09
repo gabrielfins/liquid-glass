@@ -1,6 +1,6 @@
 {
   "name": "@gabrielfins/liquid-glass",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A liquid glass effect for any element, set with a data attribute: backdrop blur, edge distortion and a soft inner glow. No dependencies.",
   "license": "MIT",
   "repository": {

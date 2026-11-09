@@ -1,8 +1,5 @@
-import { start } from '../src/auto';
-import { configure, defaultConfig, getConfig, supportsDistortion } from '../src/core';
+import { configure, defaultConfig, getConfig, start, supportsDistortion } from '../src/core';
 
-// The package's main entry does this on import. Here the source is imported
-// directly, where package.json's `sideEffects` would let the bundler drop that.
 start();
 
 // Prism comes from the CDN, as on the ripple-effect docs, and is global.
