@@ -10,7 +10,9 @@ type Entry = { id: string; filter: SVGFilterElement; map: GlassMap; users: numbe
 export type Acquired = { key: string; entry: Entry };
 
 const entries = new Map<string, Entry>();
+let root: SVGSVGElement | undefined;
 let defs: SVGDefsElement | undefined;
+let keeper: MutationObserver | undefined;
 let nextId = 0;
 let watching = false;
 
@@ -20,15 +22,35 @@ function svg(tag: string, attributes: Record<string, string | number>) {
   return element;
 }
 
+// Something other than this library can take the SVG out of the page: a framework that rebuilds
+// <body> (React does when it cannot hydrate server-rendered HTML), or code that swaps the body's
+// contents or the body itself. The filters are still inside it, so putting it back is enough for
+// every url(#...) to resolve again. Without it the glass keeps its blur and glow but loses the
+// distortion, with nothing to say so.
+function attach() {
+  if (root && !root.isConnected) {
+    document.body.append(root);
+  }
+
+  // The body may be a new one, which the observer is not watching yet.
+  keeper?.observe(document.body, { childList: true });
+}
+
 function getDefs() {
-  if (!defs) {
-    const root = svg('svg', { 'aria-hidden': 'true' });
+  if (!root || !defs) {
+    root = svg('svg', { 'aria-hidden': 'true' }) as SVGSVGElement;
     root.style.cssText = 'position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none;';
     defs = document.createElementNS(SVG_NS, 'defs');
     root.append(defs);
     document.body.append(root);
+
+    // The places it can be removed from: the children of <body>, and <body> itself.
+    keeper = new MutationObserver(attach);
+    keeper.observe(document.documentElement, { childList: true });
+    keeper.observe(document.body, { childList: true });
   }
 
+  attach();
   return defs;
 }
 

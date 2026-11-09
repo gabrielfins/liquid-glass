@@ -11,7 +11,16 @@ const PSEUDO = `${ATTRIBUTE}-pseudo`;
 const ENABLED = `${ATTRIBUTE}-enabled`;
 const SELECTOR = `[${ATTRIBUTE}]`;
 
-const instances = new WeakMap<HTMLElement, Glass>();
+// Kept in a Map, not a WeakMap, so that stop() can reach every one of them. An element that leaves
+// the page is dropped from it by the observer.
+const instances = new Map<HTMLElement, Glass>();
+
+// The stop function of the run in progress, if there is one.
+let running: (() => void) | undefined;
+
+export function isRunning() {
+  return running !== undefined;
+}
 
 function readBlur(value: string): number | undefined {
   if (value in glassBlur) {
@@ -62,11 +71,19 @@ function each(node: Node, action: (element: HTMLElement) => void) {
   node.querySelectorAll<HTMLElement>(SELECTOR).forEach(action);
 }
 
-// Finds the elements already on the page, then follows the ones that come, go
-// or change their attributes.
-export function start() {
+// Finds the elements already on the page, then follows the ones that come, go or change their
+// attributes. Returns a function that stops following them and clears the glass that was made.
+//
+// Calling it again while it runs does nothing and returns the same function, so it is safe in
+// code that may run twice (React's StrictMode, hot reload). A stop function only stops the run it
+// came from. On the server, where there is no page, it does nothing.
+export function start(): () => void {
   if (typeof document === 'undefined') {
-    return;
+    return () => {};
+  }
+
+  if (running) {
+    return running;
   }
 
   const observer = new MutationObserver((records) => {
@@ -96,4 +113,20 @@ export function start() {
   } else {
     begin();
   }
+
+  const stop = () => {
+    // An old stop function, from a run that has already ended, must not end the one running now.
+    if (running !== stop) {
+      return;
+    }
+
+    document.removeEventListener('DOMContentLoaded', begin);
+    observer.disconnect();
+    instances.forEach((instance) => instance.destroy());
+    instances.clear();
+    running = undefined;
+  };
+
+  running = stop;
+  return stop;
 }
